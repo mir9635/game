@@ -79,7 +79,7 @@ public class PlayerServiceImpl implements PlayerService {
     @Override
     public List<Player> getPage(List<Player> players, Integer pageNumber, Integer pageSize) {
         final Integer page = pageNumber == null ? 0 : pageNumber;
-        final Integer size = pageSize == null ? 0: pageSize;
+        final Integer size = pageSize == null ?  3 : pageSize;
         final  int from = page * size;
         int to = from + size;
         if (to > players.size()) to = players.size();
