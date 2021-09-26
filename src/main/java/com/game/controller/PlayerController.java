@@ -99,20 +99,23 @@ public class PlayerController {
 
     @RequestMapping(path = "rest/players/{id}", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<Player> updatePlayer(@PathVariable(value = "id") String pathId, @RequestBody Player player) {
-        final  ResponseEntity<Player> entity = getPlayer(pathId);
-        final Player savePlayer = entity.getBody();
-        if (savePlayer == null) {
-            return entity;
-        }
-
-        final  Player result;
-        try {
-            result = playerService.updatePlayer(savePlayer, player);
-        } catch (IllegalAccessException e) {
+    public ResponseEntity<Player> updatePlayer(@PathVariable(value = "id") String pathId, @RequestBody Player updatePlayer) {
+        if (!checkPlayer(updatePlayer, true)) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        Player player;
+        if (getPlayer(pathId).getStatusCode().equals(HttpStatus.OK)) {
+            player = getPlayer(pathId).getBody();
+        } else {
+            return new ResponseEntity<>(getPlayer(pathId).getStatusCode());
+        }
+        try {
+            player = playerService.updatePlayer(player, updatePlayer);
+            return new ResponseEntity<>(player, HttpStatus.OK);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @RequestMapping(path = "/rest/players/{id}", method = RequestMethod.DELETE)
@@ -137,5 +140,32 @@ public class PlayerController {
             return null;
         }
     }
+
+    private boolean checkPlayer(Player player, boolean isUpdating) {
+        if (!isUpdating) {
+            if (player.getName() == null
+                    || player.getTitle() == null
+                    || player.getRace() == null
+                    || player.getProfession() == null
+                    || player.getBirthday() == null
+                    || player.getExperience() == null) {
+                return false;
+            }
+        }
+        if ((player.getName() != null) && player.getName().length() > 12
+                || (player.getName() != null) && player.getName().trim().length() == 0
+                || (player.getTitle() != null) && player.getTitle().length() > 30
+                || (player.getExperience() != null) && (player.getExperience() < 0 || player.getExperience() > 10000000)
+                || (player.getBirthday() != null) && player.getBirthday().getTime() < 946674000000L
+                || (player.getBirthday() != null) && player.getBirthday().getTime() > 32535205199999L) {
+            return false;
+        }
+        if (player.getBanned() == null) {
+            player.setBanned(false);
+        }
+        return true;
+    }
+
+
 
 }
