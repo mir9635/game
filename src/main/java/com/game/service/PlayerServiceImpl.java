@@ -134,6 +134,8 @@ public class PlayerServiceImpl implements PlayerService {
 
     @Override
     public Player savePlayer(Player player) {
+        player.setLevel(computeLevel(player.getExperience()));
+        player.setUntilNextLevel(computeNextLevel(player.getExperience(), player.getLevel()));
         return playerRepository.save(player);
     }
 

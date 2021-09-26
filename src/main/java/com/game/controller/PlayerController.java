@@ -69,19 +69,12 @@ public class PlayerController {
     @RequestMapping(path = "/rest/players", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity<Player> createShip(@RequestBody Player player) {
-        if (!playerService.isPlayerValid(player)) {
+        if (checkPlayer(player, false)) {
+            playerService.savePlayer(player);
+        } else {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        if (player.getBanned() == null) player.setBanned(false);
-        final int level = playerService.computeLevel(player.getExperience());
-        player.setLevel(level);
-
-        final int nextLevel = playerService.computeNextLevel(level, player.getExperience());
-        player.setUntilNextLevel(nextLevel);
-
-        final Player savedPlayer = playerService.savePlayer(player);
-
-        return  new ResponseEntity<>(savedPlayer, HttpStatus.OK);
+        return new ResponseEntity<>(player, HttpStatus.OK);
     }
 
     @RequestMapping(path = "/rest/players/{id}", method = RequestMethod.GET)
