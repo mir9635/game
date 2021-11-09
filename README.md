@@ -5,8 +5,8 @@ Cтандартное CRUD приложение, которое отобража
 
 Используемые технологии:
 
-Maven
-Spring
-Hibernate
-Tomcat
+Maven</br>
+Spring</br>
+Hibernate</br>
+Tomcat</br>
 Mysql
